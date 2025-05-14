@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>비건 화장품 소비자 유형 테스트</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #quiz, #result { margin-top: 30px; }
+    button { margin: 10px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+
+<h1>비건 화장품 소비자 유형 테스트</h1>
+
+<div id="quiz">
+  <p id="question"></p>
+  <button onclick="choose(0)" id="btn0"></button>
+  <button onclick="choose(1)" id="btn1"></button>
+</div>
+
+<div id="result" style="display:none;">
+  <h2 id="result-title"></h2>
+  <p id="result-desc"></p>
+  <div id="brand-recommendation"></div>
+  <button onclick="goToSurvey()">설문조사 참여하기</button>
+</div>
+
+<script>
+const scores = { ethical: 0, trend: 0, budget: 0, sensitive: 0, aesthetic: 0 };
+
+const questions = [
+  {
+    question: "화장품을 살 때, 효과가 같다면 어떤 제품을 고르시겠습니까?",
+    options: [
+      { text: "가성비 있는 동물성 원료 제품", type: "budget" },
+      { text: "비싸도 윤리적인 비건 제품", type: "ethical" }
+    ]
+  },
+  {
+    question: "SNS에서 핫한 비건 화장품을 보면?",
+    options: [
+      { text: "바로 써보고 싶다!", type: "trend" },
+      { text: "효능과 안전성을 먼저 검토한다", type: "sensitive" }
+    ]
+  },
+  {
+    question: "피부가 민감한 편인가요?",
+    options: [
+      { text: "그렇다, 순한 성분이 중요하다", type: "sensitive" },
+      { text: "아니다, 다양한 제품을 시도해본다", type: "trend" }
+    ]
+  },
+  {
+    question: "디자인이 예쁜 화장품을 보면?",
+    options: [
+      { text: "외관도 중요해서 구매에 큰 영향을 준다", type: "aesthetic" },
+      { text: "디자인보단 성분과 기능이 중요하다", type: "ethical" }
+    ]
+  },
+  {
+    question: "비건 화장품 브랜드를 선택할 때 가장 중요한 기준은?",
+    options: [
+      { text: "친환경, 동물복지 등 브랜드의 철학", type: "ethical" },
+      { text: "내 피부에 맞는지, 가격은 적절한지", type: "sensitive" }
+    ]
+  }
+];
+
+const results = {
+  ethical: {
+    title: "윤리 실천러",
+    desc: "당신은 가치소비를 실천하는 똑똑한 소비자예요. 환경과 동물 복지를 중요하게 생각하죠!",
+    brand: "추천 브랜드: 라운드랩, 딥디크\n추천 이유: 동물 실험을 하지 않고, 지속 가능한 포장을 사용하는 등 윤리적 소비를 지향하는 브랜드예요."
+  },
+  trend: {
+    title: "트렌드 캐처",
+    desc: "최신 유행을 빠르게 캐치하는 당신! 유행하는 비건 제품도 누구보다 먼저 써보는 타입이에요.",
+    brand: "추천 브랜드: 글로시데이즈, 비건타이거\n추천 이유: SNS에서 인플루언서들 사이에서 인기 있고, 신제품 출시도 빠른 트렌디한 브랜드예요."
+  },
+  budget: {
+    title: "가성비 지향러",
+    desc: "실용성과 경제성을 우선하는 알뜰한 소비자군요! 합리적인 비건 화장품을 선호해요.",
+    brand: "추천 브랜드: 미샤 비건라인, 이니스프리\n추천 이유: 저렴한 가격에도 불구하고 품질이 우수하며, 쉽게 구매할 수 있는 가성비 브랜드예요."
+  },
+  sensitive: {
+    title: "피부 예민러",
+    desc: "당신은 피부에 순한 성분과 안정성을 가장 중요하게 생각해요. 성분표를 꼼꼼히 보는 타입이에요!",
+    brand: "추천 브랜드: 닥터지, 아비브\n추천 이유: 피부 자극이 적은 성분을 사용하고, 저자극 테스트를 완료한 믿을 수 있는 브랜드예요."
+  },
+  aesthetic: {
+    title: "감성 취향러",
+    desc: "예쁜 디자인과 감성을 중요하게 여기는 당신! 감성적이고 트렌디한 비건 브랜드에 끌려요.",
+    brand: "추천 브랜드: 언리시아, 투쿨포스쿨\n추천 이유: 감각적인 패키지 디자인과 감성적인 색감으로 소비자의 취향을 저격하는 브랜드예요."
+  }
+};
+
+let index = 0;
+
+function showQuestion() {
+  const q = questions[index];
+  document.getElementById("question").innerText = q.question;
+  document.getElementById("btn0").innerText = q.options[0].text;
+  document.getElementById("btn1").innerText = q.options[1].text;
+}
+
+function choose(i) {
+  const type = questions[index].options[i].type;
+  scores[type]++;
+  index++;
+  if (index < questions.length) showQuestion();
+  else showResult();
+}
+
+function showResult() {
+  document.getElementById("quiz").style.display = "none";
+  const best = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+  document.getElementById("result-title").innerText = results[best].title;
+  document.getElementById("result-desc").innerText = results[best].desc;
+  document.getElementById("brand-recommendation").innerHTML = results[best].brand.replace(/\n/g, "<br>");
+  document.getElementById("result").style.display = "block";
+}
+
+function goToSurvey() {
+  window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLScXJZsG_f5iT7FD2TJtxl8PnaB1NbKHYugBlv3T4tb3cjOBiA/viewform?usp=header";
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>
